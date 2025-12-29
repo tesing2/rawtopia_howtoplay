@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buildo Web</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .fade-in { animation: fadeIn 0.8s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to { opacity: 1; transform: translateY(0);} }
+
+    /* Overlay */
+    #formOverlay {
+      display:none; position:fixed; inset:0;
+      background:rgba(0,0,0,0.8); z-index:9999;
+      align-items:center; justify-content:center;
+      padding:20px;
+    }
+    .modal {
+      width:min(420px,100%); background:#fff; color:#222;
+      border-radius:12px; box-shadow:0 12px 40px rgba(0,0,0,0.45);
+      padding:22px 18px; max-height:90vh; overflow:auto;
+    }
+    .modal h2{margin:0 0 12px;text-align:center;color:#3b2a9b}
+    .modal label{display:block;margin-top:12px;font-weight:600;font-size:0.9rem}
+    .modal input,.modal textarea{
+      width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;
+      margin-top:6px; font-size:14px; box-sizing:border-box;
+    }
+    .checkbox-grid{margin-top:8px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
+    .role-item{display:flex;align-items:center;gap:8px;background:#f8f8fc;padding:8px;border-radius:8px;cursor:pointer}
+    .modal .actions-modal{display:flex;gap:10px;margin-top:16px}
+    .modal button{flex:1;padding:10px;border-radius:8px;font-weight:700;cursor:pointer}
+    .primary{background:linear-gradient(90deg,#5865f2,#7b4ef5);color:#fff;border:0}
+    .secondary{background:#ddd;color:#222;border:0}
+  </style>
+</head>
+<body class="bg-gray-950 text-white min-h-screen font-sans transition-all">
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-5 right-5 bg-green-600 text-white px-4 py-2 rounded shadow-lg hidden z-50">
+    ✅ Copied!
+  </div>
+
+  <!-- Header -->
+  <header class="bg-gray-900 w-full py-4 md:py-6 shadow-md mb-10">
+    <div class="max-w-4xl mx-auto px-4 md:px-6 text-center">
+      <h1 class="text-3xl md:text-4xl font-extrabold tracking-wide flex justify-center items-center gap-3">
+        🌐 Buildo Host Setup
+      </h1>
+      <p class="text-gray-400 mt-2 text-xs md:text-sm">Set up your host files for different platforms easily. If you encountered bugs please report it to @Clem on Discord!</p>
+
+      <!-- Buttons -->
+      <div class="flex justify-center gap-4 mt-4">
+        <a href="https://discord.gg/WHBd6PG7q3" target="_blank"
+           class="bg-indigo-600 hover:bg-indigo-700 px-5 py-2 rounded font-semibold shadow-md">💬 Join Discord</a>
+        <button onclick="openForm()"
+           class="bg-purple-600 hover:bg-purple-700 px-5 py-2 rounded font-semibold shadow-md">📋 Apply Now</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-4xl mx-auto px-4 md:px-6 grid gap-6 fade-in">
+
+    <!-- Download Section -->
+    <section class="bg-gray-800 p-6 rounded-lg shadow-md text-center">
+      <h2 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-4">
+        ⬇️ Download Android Host File
+      </h2>
+      <a id="downloadBtn" href="#" download="Buildo_hosts.txt"
+         class="bg-blue-600 hover:bg-blue-700 transition-all px-6 py-3 rounded-full inline-block font-medium">
+        📄 Download Host File
+      </a>
+    </section>
+
+    <!-- Vhost APK Download -->
+    <section class="text-center">
+      <a href="vhost.apk" download
+         class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-5 py-3 rounded transition-all inline-block">
+       📲 Download Virtual Hosts APK
+      </a>
+      <p class="text-sm text-gray-400 mt-2">Size: ~2.3MB • Requires Android 5.0+</p>
+    </section>
+
+    <!-- Platform Blocks -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- Power Tunnel -->
+      <div class="bg-gray-800 p-4 md:p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-3">⚙️ Power Tunnel Host</h2>
+        <div class="bg-gray-700 p-3 rounded text-sm text-gray-300 mb-2">Click to copy Power Tunnel URL</div>
+        <textarea id="PtunnelText" class="hidden" readonly>https://growsoft.cc/android.txt</textarea>
+        <button onclick="copyText('PtunnelText')" class="w-full md:w-auto mt-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-all">📋 Copy</button>
+      </div>
+
+      <!-- macOS Host -->
+      <div class="bg-gray-800 p-4 md:p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-3">🍏 macOS Host</h2>
+        <div class="bg-gray-700 p-3 rounded text-sm text-gray-300 mb-2">Copy macOS host entries for your system</div>
+        <textarea id="macText" class="hidden" readonly>
+91.134.85.13 growtopia1.com
+91.134.85.13 growtopia2.com
+91.134.85.13 www.growtopia1.com
+91.134.85.13 www.growtopia2.com</textarea>
+        <button onclick="copyText('macText')" class="w-full md:w-auto mt-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-all">📋 Copy</button>
+      </div>
+
+      <!-- Windows Host -->
+      <div class="bg-gray-800 p-4 md:p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-3">🪟 Windows Host</h2>
+        <div class="bg-gray-700 p-3 rounded text-sm text-gray-300 mb-2">Copy Windows host entries to clipboard</div>
+        <textarea id="windowsText" class="hidden" readonly>
+91.134.85.13 growtopia1.com
+91.134.85.13 growtopia2.com
+91.134.85.13 www.growtopia1.com
+91.134.85.13 www.growtopia2.com</textarea>
+        <button onclick="copyText('windowsText')" class="w-full md:w-auto mt-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded transition-all">📋 Copy</button>
+      </div>
+
+      <!-- iOS Host -->
+      <div class="bg-gray-800 p-4 md:p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-3">📱 iOS Host Link</h2>
+        <div class="bg-gray-700 p-3 rounded text-sm text-gray-300 mb-2">Tap to copy iOS config</div>
+        <textarea id="iosText" class="hidden" readonly>
+[General]
+bypass-system = true
+
+[Rule]
+FINAL,DIRECT
+
+[Host]
+growtopia1.com = 91.134.85.13
+growtopia2.com = 91.134.85.13
+www.growtopia1.com = 91.134.85.13
+www.growtopia2.com = 91.134.85.13
+RvLnd.here = 91.134.85.13</textarea>
+        <button onclick="copyText('iosText')" class="w-full md:w-auto mt-2 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded transition-all">📋 Copy</button>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-12 text-center text-sm text-gray-500 pb-6">
+    &copy; Created By Clem. All rights reserved.
+  </footer>
+
+  <!-- Apply Form Overlay -->
+  <div id="formOverlay">
+    <div class="modal">
+      <h2>Application Form</h2>
+      <form action="https://formsubmit.co/harriepoonin2@gmail.com" method="POST">
+        <label>1. Discord & Buildo ID</label>
+        <input type="text" name="Full Name" required>
+
+        <label>2. Email</label>
+        <input type="email" name="Email" required>
+
+        <label>3. Roles (choose any)</label>
+        <div class="checkbox-grid">
+          <label class="role-item"><input type="checkbox" name="Roles[]" value="Co-Owner"> Co-Owner</label>
+          <label class="role-item"><input type="checkbox" name="Roles[]" value="Promoter"> Promoter</label>
+          <label class="role-item"><input type="checkbox" name="Roles[]" value="Manager"> Manager</label>
+          <label class="role-item"><input type="checkbox" name="Roles[]" value="Discord Manager"> Discord Manager</label>
+          <label class="role-item"><input type="checkbox" name="Roles[]" value="Event Manager"> Event Manager</label>
+        </div>
+
+        <label>4. Experience</label>
+        <textarea name="Experience" rows="3"></textarea>
+
+        <label>5. Why should we choose you?</label>
+        <textarea name="Why Choose Me" rows="3" required></textarea>
+
+        <label>6. Availability (hours per week)</label>
+        <input type="text" name="Availability" required>
+
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_next" value="https://tesing2.github.io/Buildoweb.host/thankyou.html">
+
+        <div class="actions-modal">
+          <button type="submit" class="primary">Submit</button>
+          <button type="button" class="secondary" onclick="closeForm()">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Downloadable host file content
+    const downloadContent = `91.134.85.13 growtopia1.com
+91.134.85.13 growtopia2.com
+91.134.85.13 www.growtopia1.com
+91.134.85.13 www.growtopia2.com`;
+    document.getElementById("downloadBtn").href = URL.createObjectURL(new Blob([downloadContent],{type:"text/plain"}));
+
+    // Copy text helper
+    function copyText(id){
+      const textArea=document.getElementById(id);
+      navigator.clipboard.writeText(textArea.value).then(()=>showToast()).catch(err=>console.error(err));
+    }
+    function showToast(){
+      const toast=document.getElementById("toast");
+      toast.classList.remove("hidden");
+      setTimeout(()=>toast.classList.add("hidden"),2000);
+    }
+
+    // Form overlay
+    const overlay=document.getElementById("formOverlay");
+    function openForm(){overlay.style.display="flex";document.body.style.overflow="hidden";}
+    function closeForm(){overlay.style.display="none";document.body.style.overflow="";}
+  </script>
+
+</body>
+</html>
